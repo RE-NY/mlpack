@@ -1,0 +1,29 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Runs weekly at midnight on Sunday
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up CMake
+        uses: swc-ci/cmake@v1.0
+        with:
+          cmake-version: '3.22'  # Use a version compatible with your project
+
+      - name: Update Dependencies
+        run: |
+          # Update the STB submodule
+          git submodule update --remote external/stb
+          # Commit changes if there are any
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add external/stb
+          git commit -m "Update STB library"
+          git push origin main
